@@ -3,10 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>f1Xchange</title>
+    <meta name="theme-color" content="#0B0B0F">
+    <meta name="description" content="F1Xchange — trade Driver Shares in independent constant-product markets.">
+    <title>F1Xchange</title>
     <link type="text/css" rel="stylesheet" href="styles.css">
     <script type="application/javascript" src="composeApp.js"></script>
 </head>
 <body>
+    <!-- Shown until the wasm bundle takes over the body. Without it the page is blank white
+         for the first few seconds, which reads as a broken link rather than a loading app. -->
+    <div id="boot">
+        <div id="boot-mark">F1X</div>
+        <div id="boot-text">Opening the markets…</div>
+    </div>
 </body>
 </html>

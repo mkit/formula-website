@@ -1,7 +1,54 @@
+:root { color-scheme: dark light; }
+
 html, body {
-    width: 100%;
-    height: 100%;
     margin: 0;
     padding: 0;
+    height: 100%;
+    background: #0B0B0F;
+    color: #F2F2F5;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     overflow: hidden;
+}
+
+#boot {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    background: radial-gradient(circle at 50% 35%, rgba(225, 6, 0, 0.10), #0B0B0F 60%);
+}
+
+#boot-mark {
+    width: 58px;
+    height: 58px;
+    border-radius: 17px;
+    background: linear-gradient(135deg, #FF2A33, #B00400);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    color: #fff;
+    animation: pulse 1.6s ease-in-out infinite;
+}
+
+#boot-text {
+    font-size: 13px;
+    letter-spacing: 0.4px;
+    color: #9E9EB0;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50%      { transform: scale(0.94); opacity: 0.75; }
+}
+
+@media (prefers-color-scheme: light) {
+    html, body { background: #F7F7FA; color: #111116; }
+    #boot { background: radial-gradient(circle at 50% 35%, rgba(225, 6, 0, 0.07), #F7F7FA 60%); }
+    #boot-text { color: #5A5A6B; }
 }
