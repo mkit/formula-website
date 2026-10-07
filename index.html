@@ -4,17 +4,216 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0B0B0F">
-    <meta name="description" content="F1Xchange — trade Driver Shares in independent constant-product markets.">
+    <meta name="description" content="F1Xchange — private demo.">
+    <!-- Keeps the demo out of search results. This is the part that actually reduces who finds it;
+         the gate below only slows down whoever already has the link. -->
+    <meta name="robots" content="noindex, nofollow">
     <title>F1Xchange</title>
     <link type="text/css" rel="stylesheet" href="styles.css">
-    <script type="application/javascript" src="composeApp.js"></script>
+
+    <!--
+      THIS IS A DOOR, NOT A LOCK. Read this before trusting it.
+
+      Everything the demo needs is served as static files, so every one of them can still be
+      fetched directly by URL — composeApp.js, both .wasm bundles, the race archives. This page
+      stops a casual visitor who opens the link; it does not stop anybody who looks. GitHub Pages
+      has no server-side protection to use instead, so there is no stronger option on this host.
+
+      What it does do properly:
+        * The application script is never requested until the password is right, so the demo does
+          not quietly run behind an overlay that could be removed in the inspector.
+        * The password itself is not in this file. What is stored is a PBKDF2-SHA256 verifier at
+          250,000 iterations, so reading the source does not hand anybody the word — which matters
+          only because people reuse passwords, and is why this one should be a throwaway.
+
+      If the demo ever needs real protection, the answer is a host that can gate requests at the
+      edge rather than a cleverer version of this page.
+    -->
+    <style>
+        #gate {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            padding: 24px;
+            box-sizing: border-box;
+            background: radial-gradient(circle at 50% 35%, rgba(225, 6, 0, 0.10), #0B0B0F 60%);
+        }
+        #gate-mark {
+            width: 58px;
+            height: 58px;
+            border-radius: 17px;
+            background: linear-gradient(135deg, #FF2A33, #B00400);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 19px;
+            letter-spacing: 0.5px;
+            color: #fff;
+        }
+        #gate-title { font-size: 15px; font-weight: 600; color: #F2F2F5; }
+        #gate-note { font-size: 13px; color: #8A8A96; text-align: center; max-width: 320px; line-height: 1.5; }
+        #gate-form { display: flex; gap: 8px; width: 100%; max-width: 340px; }
+        #gate-input {
+            flex: 1;
+            min-width: 0;
+            height: 44px;
+            padding: 0 14px;
+            border-radius: 10px;
+            border: 1px solid #2A2A33;
+            background: #15151B;
+            color: #F2F2F5;
+            font-size: 15px;
+            font-family: inherit;
+        }
+        #gate-input:focus { outline: none; border-color: #FF2A33; }
+        #gate-submit {
+            height: 44px;
+            padding: 0 18px;
+            border-radius: 10px;
+            border: 0;
+            background: linear-gradient(135deg, #FF2A33, #B00400);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+        }
+        #gate-submit:disabled { opacity: 0.5; cursor: default; }
+        #gate-error { font-size: 13px; color: #FF6066; min-height: 18px; }
+    </style>
 </head>
 <body>
-    <!-- Shown until the wasm bundle takes over the body. Without it the page is blank white
-         for the first few seconds, which reads as a broken link rather than a loading app. -->
-    <div id="boot">
-        <div id="boot-mark">F1X</div>
-        <div id="boot-text">Opening the markets…</div>
+    <div id="gate">
+        <div id="gate-mark">F1X</div>
+        <div id="gate-title">F1Xchange — private demo</div>
+        <div id="gate-note">
+            This is a working prototype shared for review. Enter the password you were given.
+        </div>
+        <form id="gate-form" autocomplete="off">
+            <input id="gate-input" type="password" placeholder="Password" aria-label="Password"
+                   autocomplete="off" autocapitalize="off" spellcheck="false">
+            <button id="gate-submit" type="submit">Enter</button>
+        </form>
+        <div id="gate-error" role="status" aria-live="polite"></div>
     </div>
+
+    <script type="application/javascript">
+        (function () {
+            "use strict";
+
+            var SALT_HEX = "9f3c1d7a46b802e5c1a9d4f60b73e218";
+            var ITERATIONS = 250000;
+            var VERIFIER = "8670efedede5c88cc65b6ac90bc53bda8b421d0a97b553ca8c15458c2419ecb3";
+            var UNLOCK_KEY = "f1x-demo-unlocked";
+
+            var gate = document.getElementById("gate");
+            var form = document.getElementById("gate-form");
+            var input = document.getElementById("gate-input");
+            var submit = document.getElementById("gate-submit");
+            var error = document.getElementById("gate-error");
+
+            // Compose takes over document.body, so the boot markup is put in place and the
+            // application script appended only now. Loading it earlier would wipe this page.
+            function boot() {
+                document.body.innerHTML =
+                    '<div id="boot"><div id="boot-mark">F1X</div>' +
+                    '<div id="boot-text">Opening the markets…</div></div>';
+                var script = document.createElement("script");
+                script.type = "application/javascript";
+                script.src = "composeApp.js";
+                document.head.appendChild(script);
+            }
+
+            // sessionStorage rather than localStorage: the unlock lasts for the tab and no longer,
+            // so a demo left open on a shared machine does not stay open for the next person.
+            // Wrapped because a private window or blocked site data makes the accessor throw.
+            function remembered() {
+                try { return window.sessionStorage.getItem(UNLOCK_KEY) === "1"; } catch (e) { return false; }
+            }
+            function remember() {
+                try { window.sessionStorage.setItem(UNLOCK_KEY, "1"); } catch (e) { /* no matter */ }
+            }
+
+            function hex(buffer) {
+                var bytes = new Uint8Array(buffer);
+                var out = "";
+                for (var i = 0; i < bytes.length; i++) {
+                    out += bytes[i].toString(16).padStart(2, "0");
+                }
+                return out;
+            }
+
+            function saltBytes() {
+                var bytes = new Uint8Array(SALT_HEX.length / 2);
+                for (var i = 0; i < bytes.length; i++) {
+                    bytes[i] = parseInt(SALT_HEX.substr(i * 2, 2), 16);
+                }
+                return bytes;
+            }
+
+            function verify(password) {
+                var subtle = window.crypto && window.crypto.subtle;
+                if (!subtle) {
+                    // WebCrypto needs a secure context. The published site is https, so this only
+                    // happens if the files are opened over file:// or plain http.
+                    return Promise.reject(new Error("insecure-context"));
+                }
+                return subtle
+                    .importKey("raw", new TextEncoder().encode(password), { name: "PBKDF2" }, false, ["deriveBits"])
+                    .then(function (key) {
+                        return subtle.deriveBits(
+                            { name: "PBKDF2", salt: saltBytes(), iterations: ITERATIONS, hash: "SHA-256" },
+                            key,
+                            256
+                        );
+                    })
+                    .then(function (bits) { return hex(bits) === VERIFIER; });
+            }
+
+            if (remembered()) {
+                boot();
+                return;
+            }
+
+            form.addEventListener("submit", function (event) {
+                event.preventDefault();
+                var password = input.value;
+                if (!password) return;
+
+                // 250,000 iterations takes a moment on a phone, so say so rather than appearing stuck.
+                submit.disabled = true;
+                submit.textContent = "Checking…";
+                error.textContent = "";
+
+                verify(password).then(
+                    function (ok) {
+                        if (ok) {
+                            remember();
+                            boot();
+                            return;
+                        }
+                        submit.disabled = false;
+                        submit.textContent = "Enter";
+                        error.textContent = "That password is not right.";
+                        input.select();
+                    },
+                    function (reason) {
+                        submit.disabled = false;
+                        submit.textContent = "Enter";
+                        error.textContent = reason && reason.message === "insecure-context"
+                            ? "This page has to be served over https."
+                            : "Something went wrong checking that. Try again.";
+                    }
+                );
+            });
+
+            input.focus();
+        })();
+    </script>
 </body>
 </html>
