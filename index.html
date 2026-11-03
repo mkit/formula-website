@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0B0B0F">
+    <meta name="theme-color" content="#011426">
     <meta name="description" content="F1Xchange — private demo.">
     <!-- Keeps the demo out of search results. This is the part that actually reduces who finds it;
          the gate below only slows down whoever already has the link. -->
@@ -40,23 +40,24 @@
             gap: 18px;
             padding: 24px;
             box-sizing: border-box;
-            background: radial-gradient(circle at 50% 35%, rgba(225, 6, 0, 0.10), #0B0B0F 60%);
+            background: radial-gradient(circle at 50% 35%, rgba(1, 20, 38, 0.55), rgba(1, 20, 38, 0.92) 70%),
+                        url("composeResources/f1xchange.composeapp.generated.resources/drawable/bg_streaks.jpg") center / cover no-repeat, #011426;
         }
         #gate-mark {
             width: 58px;
             height: 58px;
             border-radius: 17px;
-            background: linear-gradient(135deg, #FF2A33, #B00400);
+            background: linear-gradient(135deg, #00E0F8, #2E9BFF);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
             font-size: 19px;
             letter-spacing: 0.5px;
-            color: #fff;
+            color: #00202A;
         }
-        #gate-title { font-size: 15px; font-weight: 600; color: #F2F2F5; }
-        #gate-note { font-size: 13px; color: #8A8A96; text-align: center; max-width: 320px; line-height: 1.5; }
+        #gate-title { font-size: 15px; font-weight: 600; color: #EAF4FF; }
+        #gate-note { font-size: 13px; color: #8FB0CC; text-align: center; max-width: 320px; line-height: 1.5; }
         #gate-form { display: flex; gap: 8px; width: 100%; max-width: 340px; }
         #gate-input {
             flex: 1;
@@ -64,20 +65,20 @@
             height: 44px;
             padding: 0 14px;
             border-radius: 10px;
-            border: 1px solid #2A2A33;
-            background: #15151B;
-            color: #F2F2F5;
+            border: 1px solid #1E4A72;
+            background: rgba(6, 35, 63, 0.85);
+            color: #EAF4FF;
             font-size: 15px;
             font-family: inherit;
         }
-        #gate-input:focus { outline: none; border-color: #FF2A33; }
+        #gate-input:focus { outline: none; border-color: #00E0F8; }
         #gate-submit {
             height: 44px;
             padding: 0 18px;
             border-radius: 10px;
             border: 0;
-            background: linear-gradient(135deg, #FF2A33, #B00400);
-            color: #fff;
+            background: linear-gradient(135deg, #00E0F8, #2E9BFF);
+            color: #00202A;
             font-size: 15px;
             font-weight: 600;
             font-family: inherit;
