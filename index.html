@@ -9,6 +9,7 @@
          the gate below only slows down whoever already has the link. -->
     <meta name="robots" content="noindex, nofollow">
     <title>F1Xchange</title>
+    <link rel="icon" type="image/png" href="favicon.png">
     <link type="text/css" rel="stylesheet" href="styles.css">
 
     <!--
@@ -43,19 +44,7 @@
             background: radial-gradient(circle at 50% 35%, rgba(1, 20, 38, 0.55), rgba(1, 20, 38, 0.92) 70%),
                         url("composeResources/f1xchange.composeapp.generated.resources/drawable/bg_streaks.jpg") center / cover no-repeat, #011426;
         }
-        #gate-mark {
-            width: 58px;
-            height: 58px;
-            border-radius: 17px;
-            background: linear-gradient(135deg, #00E0F8, #2E9BFF);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 19px;
-            letter-spacing: 0.5px;
-            color: #00202A;
-        }
+        #gate-mark { height: 56px; width: auto; display: block; }
         #gate-title { font-size: 15px; font-weight: 600; color: #EAF4FF; }
         #gate-note { font-size: 13px; color: #8FB0CC; text-align: center; max-width: 320px; line-height: 1.5; }
         #gate-form { display: flex; gap: 8px; width: 100%; max-width: 340px; }
@@ -90,7 +79,7 @@
 </head>
 <body>
     <div id="gate">
-        <div id="gate-mark">F1X</div>
+        <img id="gate-mark" src="composeResources/f1xchange.composeapp.generated.resources/drawable/f1x_logo_dark.png" alt="F1Xchange">
         <div id="gate-title">F1Xchange — private demo</div>
         <div id="gate-note">
             This is a working prototype shared for review. Enter the password you were given.
@@ -122,7 +111,7 @@
             // application script appended only now. Loading it earlier would wipe this page.
             function boot() {
                 document.body.innerHTML =
-                    '<div id="boot"><div id="boot-mark">F1X</div>' +
+                    '<div id="boot"><img id="boot-mark" src="composeResources/f1xchange.composeapp.generated.resources/drawable/f1x_logo_dark.png" alt="F1Xchange">' +
                     '<div id="boot-text">Opening the markets…</div></div>';
                 var script = document.createElement("script");
                 script.type = "application/javascript";
